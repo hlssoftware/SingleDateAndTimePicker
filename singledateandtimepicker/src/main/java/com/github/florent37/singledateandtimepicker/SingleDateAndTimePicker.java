@@ -341,6 +341,12 @@ public class SingleDateAndTimePicker extends LinearLayout {
         if (indexOfMin != -1) {
             minutesPicker.setSelectedItemPosition(indexOfMin);
         }
+        // HLS Software 170331
+        // With 5 minute granularity, setting a time to between x:56 and x:59 rounds up to x:00 not x+1:00
+        // Catch this and append one value to the hour picker
+        if (calendar.MINUTE > 55 && calendar.MINUTE <= 59) {
+            hoursPicker.setSelectedItemPosition(indexOfHour+1);   
+        }
     }
 
     private void updateListener() {
