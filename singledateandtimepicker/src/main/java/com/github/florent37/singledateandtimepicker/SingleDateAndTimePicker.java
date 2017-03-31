@@ -240,7 +240,17 @@ public class SingleDateAndTimePicker extends LinearLayout {
                     //scroll to Min position
                     daysPicker.scrollTo(daysPicker.findIndexOfDate(minDate));
                     minutesPicker.scrollTo(minutesPicker.findIndexOfDate(minDate));
-                    hoursPicker.scrollTo(hoursPicker.findIndexOfDate(minDate));
+                    
+                    // HLS Software 170331
+                    // With 5 minute granularity, setting a time to between x:56 and x:59 rounds up to x:00 not x+1:00
+                    // Catch this and append one value to the hour picker
+                    if (Calendar.getInstance().MINUTE > 55 && Calendar.getInstance().MINUTE <= 59) {
+                        hoursPicker.scrollTo(hoursPicker.findIndexOfDate(minDate)+1);  
+                    } else {
+                        hoursPicker.scrollTo(hoursPicker.findIndexOfDate(minDate));
+                    }
+                    
+                    
                 }
             }
         }, DELAY_BEFORE_CHECK_PAST);
@@ -262,6 +272,9 @@ public class SingleDateAndTimePicker extends LinearLayout {
 
     private boolean isBeforeMinDate(Date date) {
         final Calendar minDateCalendar = Calendar.getInstance();
+        if(mustBeOnFuture){ // the minDate is constant even if the date has changed, so refresh it before comparing
+            minDate = Calendar.getInstance().getTime(); //minDate is Today
+        }
         minDateCalendar.setTime(minDate);
         minDateCalendar.set(Calendar.MILLISECOND, 0);
         minDateCalendar.set(Calendar.SECOND, 0);
